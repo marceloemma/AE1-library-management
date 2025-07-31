@@ -15,14 +15,14 @@ This project implements a library management system with a focus on demonstratin
 - **Database Persistence**: SQLite database with full CRUD operations
 - **Web Interface**: Streamlit-based frontend with separate Member and Staff views
 
-### Object-Oriented Programming Concepts Demonstrated
+### OOP Concepts Used
 
-- **Abstract Classes**: `LibraryItem` and `User` base classes with abstract methods
-- **Inheritance**: Item types (`Book`, `Magazine`, `DVD`) and user types (`Member`, `Staff`)
-- **Polymorphism**: Method overriding for different behaviors (loan periods, borrowing limits)
-- **Encapsulation**: Protected attributes with property decorators and validation
-- **Static Attributes/Methods**: Class-level counters and utility functions
-- **Composition**: `LibrarySystem` managing collections of other objects
+- **Abstract Classes**: Base classes that enforce method implementation in subclasses
+- **Inheritance**: Different item types and user types inherit common functionality  
+- **Polymorphism**: Same method names behave differently (e.g., loan periods vary by item type)
+- **Encapsulation**: Private attributes with controlled access via properties
+- **Static Methods**: Class-level counters and utility functions
+- **Composition**: Main system coordinates multiple object types
 
 ## Technology Stack
 
@@ -108,18 +108,11 @@ AE1-library-management/
 3. **Login using demo credentials**:
 
    **Member Accounts**:
-   - `M001` - Alice Johnson
-   - `M002` - Bob Smith
-   - `M003` - Carol Davis
-   - `M004` - David Wilson
-   - `M005` - Emma Brown
+   - `M001` - Marcelo Amorelli
+   - `M002` - Umar Hussain
 
    **Staff Accounts**:
-   - `S001` - Sarah Williams (Manager)
-   - `S002` - Michael Rodriguez (Librarian)
-   - `S003` - Jennifer Martinez (Librarian)
-   - `S004` - Robert Thompson (Manager)
-   - `S005` - Lisa Garcia (Librarian)
+   - `S001` - Jiri Motejlek (Manager)
 
 ### Command Line Interface
 
@@ -167,22 +160,6 @@ print(f"Checkout result: {message}")
 5. **Reports**: Generate system reports and analytics
 6. **Settings**: Configure system parameters (for authorised staff)
 
-## Testing
-
-The project includes a comprehensive test suite that validates all OOP principles:
-
-```bash
-python scripts/test_system.py
-```
-
-**Test Coverage**:
-- Abstract class instantiation prevention
-- Inheritance and polymorphism verification
-- Encapsulation and property validation
-- Static attributes and methods
-- Business logic functionality
-- Error handling and validation
-
 ## Database Schema
 
 The system uses SQLite with the following main tables:
@@ -206,21 +183,20 @@ The system uses SQLite with the following main tables:
 - Different borrowing limits and loan periods based on user/item types
 - Polymorphic method implementations
 
-## Assignment Requirements Fulfillment
+## OOP Requirements Met
 
-- **UML Diagram**: Complete class diagram showing relationships
-- **Abstract Classes**: `LibraryItem` and `User` with abstract methods
-- **Inheritance**: Multiple levels with `Book`/`Magazine`/`DVD` and `Member`/`Staff`
-- **Polymorphism**: Method overriding for type-specific behavior
-- **Encapsulation**: Protected attributes with property access
-- **Static Elements**: Class counters and utility methods
-- **Clean Code**: Comprehensive documentation and type hints
-- **Error Handling**: Validation and graceful error management
+- **UML Diagram**: Class relationships diagram included
+- **Abstract Classes**: Base classes with abstract methods that subclasses must implement
+- **Inheritance**: Item types and user types inherit from base classes
+- **Polymorphism**: Same method names work differently for different types
+- **Encapsulation**: Private data with controlled access through properties
+- **Static Elements**: Class-level counters and shared methods
+- **Error Handling**: Input validation and proper error messages
 
-### Key Design Decisions
+### Design Notes
 
-1. **Layered Architecture**: Separation of models, database, and presentation layers
-2. **Abstract Base Classes**: Enforce contracts and enable polymorphism
-3. **Property Decorators**: Provide controlled access to internal state
-4. **Static Methods**: Track system-wide statistics and configurations
+- **Layered Architecture**: Models, database, and frontend are separated
+- **Abstract Classes**: Force subclasses to implement required methods
+- **Properties**: Control access to internal data
+- **Static Methods**: Track counters and system stats
 

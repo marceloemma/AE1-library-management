@@ -12,12 +12,9 @@ import uuid
 
 class Loan:
     """
-    Represents a loan transaction for a library item.
+    Tracks when a user borrows a library item.
     
-    Demonstrates:
-    - Encapsulation with protected attributes and properties
-    - Business logic for loan management
-    - Date calculations and fine tracking
+    Handles due dates, renewals, and overdue fines.
     """
     
     # Static attributes for loan management
@@ -25,15 +22,8 @@ class Loan:
     _total_loans = 0
     
     def __init__(self, user_id: str, item_id: str, loan_period_days: int = 21):
-        """
-        Initialise a new loan.
-        
-        Args:
-            user_id: ID of the user borrowing the item
-            item_id: ID of the item being borrowed
-            loan_period_days: Number of days for the loan period (default 21)
-        """
-        self._loan_id = str(uuid.uuid4())  # Generate unique loan ID
+        """Create a new loan record."""
+        self._loan_id = str(uuid.uuid4())  # unique ID for this loan
         self._user_id = user_id
         self._item_id = item_id
         self._date_borrowed = datetime.now()
@@ -42,25 +32,25 @@ class Loan:
         self._is_returned = False
         self._fine_amount = 0.0
         self._renewal_count = 0
-        self._max_renewals = 2  # Maximum number of renewals allowed
+        self._max_renewals = 2  # can only renew twice
         
-        # Increment static counter
+        # track total loans
         Loan._total_loans += 1
     
     # Properties for encapsulation
     @property
     def loan_id(self) -> str:
-        """Get the loan ID (read-only)."""
+        """Get loan ID."""
         return self._loan_id
     
     @property
     def user_id(self) -> str:
-        """Get the user ID (read-only)."""
+        """Get user ID."""
         return self._user_id
     
     @property
     def item_id(self) -> str:
-        """Get the item ID (read-only)."""
+        """Get item ID."""
         return self._item_id
     
     @property

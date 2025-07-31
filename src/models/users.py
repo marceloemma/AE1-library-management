@@ -16,12 +16,9 @@ if TYPE_CHECKING:
 
 class Member(User):
     """
-    Member class inheriting from User.
+    Regular library member with borrowing privileges.
     
-    Demonstrates:
-    - Inheritance from abstract base class
-    - Method overriding with member-specific behavior
-    - Member-specific borrowing limits and history tracking
+    Inherits from User and implements member-specific borrowing logic.
     """
     
     # Static attributes for member limits
@@ -29,15 +26,7 @@ class Member(User):
     _total_members = 0
     
     def __init__(self, user_id: str, name: str, email: str, phone: Optional[str] = None):
-        """
-        Initialise a member.
-        
-        Args:
-            user_id: Unique identifier for the member
-            name: Full name of the member
-            email: Email address of the member
-            phone: Phone number (optional)
-        """
+        """Create a new library member."""
         super().__init__(user_id, name, email)
         self._phone = phone
         self._borrowed_items: List[str] = []  # List of item IDs currently borrowed
@@ -45,7 +34,7 @@ class Member(User):
         self._fines_owed = 0.0
         self._membership_expiry = datetime.now() + timedelta(days=365)  # 1 year from now
         
-        # Increment member-specific counter
+        # count total members
         Member._total_members += 1
     
     # Properties for member-specific attributes
@@ -87,147 +76,107 @@ class Member(User):
         return Member._total_members
     
     # Override abstract methods (polymorphism)
-    def get_borrowing_limit(self) -> int:
-        """
-        Get the borrowing limit for this member.
-        
-        Returns:
-            int: Maximum number of items this member can borrow
-        """
+    def get_borrowing_limit(self):
+        """Max items this member can borrow at once."""
         return self._default_borrowing_limit  # All members get 5 items
     
-    def get_role(self) -> str:
-        """
-        Get the role of the user.
-        
-        Returns:
-            str: "Member"
-        """
+    def get_role(self):
+        """Returns 'Member'."""
         return "Member"
     
-    def can_borrow_item(self, item: 'LibraryItem') -> bool:
-        """
-        Check if the member can borrow a specific item.
-        
-        Args:
-            item: The library item to check
-            
-        Returns:
-            bool: True if member can borrow the item, False otherwise
-        """
-        # Check if member has reached borrowing limit
-        if len(self._borrowed_items) >= self.get_borrowing_limit():
-            return False
-        
-        # Check if item is available
+    def can_borrow_item(self, item):
+        """Check if member can borrow this item (based on limits and availability)."""
         if not item.is_available:
             return False
         
-        # Check if membership is active
-        if datetime.now() > self._membership_expiry:
-            return False
-        
-        # Check if member has outstanding fines (limit borrowing if fines > $10)
-        if self._fines_owed > 10.0:
-            return False
+        current_loans = len(self._borrowed_items)
+        if current_loans >= self.get_borrowing_limit():
+            return False  # already at limit
         
         return True
     
-    # Member-specific methods
-    def borrow_item(self, item_id: str) -> bool:
-        """
-        Borrow an item.
-        
-        Args:
-            item_id: ID of the item to borrow
-            
-        Returns:
-            bool: True if item was successfully borrowed, False otherwise
-        """
-        if len(self._borrowed_items) >= self.get_borrowing_limit():
-            return False
-        
+    def add_borrowed_item(self, item_id: str) -> bool:
+        """Add an item to borrowed list."""
         if item_id not in self._borrowed_items:
             self._borrowed_items.append(item_id)
             return True
-        
         return False
     
-    def return_item(self, item_id: str) -> bool:
-        """
-        Return a borrowed item.
-        
-        Args:
-            item_id: ID of the item to return
-            
-        Returns:
-            bool: True if item was successfully returned, False otherwise
-        """
+    def remove_borrowed_item(self, item_id: str) -> bool:
+        """Remove an item from borrowed list."""
         if item_id in self._borrowed_items:
             self._borrowed_items.remove(item_id)
             return True
-        
         return False
     
-    def add_loan_to_history(self, loan_id: str) -> None:
-        """
-        Add a loan to the member's history.
-        
-        Args:
-            loan_id: ID of the loan to add to history
-        """
+    def add_fine(self, amount: float):
+        """Add to fines owed."""
+        self._fines_owed += amount
+    
+    def pay_fines(self, amount: float) -> float:
+        """Pay some fines. Returns remaining balance."""
+        self._fines_owed = max(0, self._fines_owed - amount)
+        return self._fines_owed
+    
+    def is_membership_active(self) -> bool:
+        """Check if membership is still valid."""
+        return datetime.now() < self._membership_expiry
+    
+    def extend_membership(self, days: int = 365):
+        """Extend membership by specified days."""
+        self._membership_expiry += timedelta(days=days)
+    
+    def add_to_loan_history(self, loan_id: str):
+        """Add loan to history."""
         if loan_id not in self._loan_history:
             self._loan_history.append(loan_id)
     
-    def add_fine(self, amount: float) -> None:
-        """
-        Add a fine to the member's account.
-        
-        Args:
-            amount: Fine amount to add
-        """
-        if amount > 0:
-            self._fines_owed += amount
+    def get_borrowing_statistics(self) -> dict:
+        """Get member borrowing stats."""
+        return {
+            'total_loans': len(self._loan_history),
+            'active_loans': len(self._borrowed_items),
+            'fines_owed': self._fines_owed,
+            'membership_active': self.is_membership_active(),
+            'borrowing_limit': self.get_borrowing_limit()
+        }
     
-    def pay_fine(self, amount: float) -> bool:
-        """
-        Pay a fine.
-        
-        Args:
-            amount: Amount to pay
-            
-        Returns:
-            bool: True if payment was successful, False otherwise
-        """
-        if amount <= 0 or amount > self._fines_owed:
-            return False
-        
-        self._fines_owed -= amount
-        return True
+    def to_dict(self) -> dict:
+        """Convert to dict for storage."""
+        return {
+            'user_id': self._user_id,
+            'name': self._name,
+            'email': self._email,
+            'role': 'Member',
+            'phone': self._phone,
+            'registration_date': self._registration_date.isoformat(),
+            'membership_expiry': self._membership_expiry.isoformat(),
+            'borrowed_items': self._borrowed_items.copy(),
+            'loan_history': self._loan_history.copy(),
+            'fines_owed': self._fines_owed
+        }
     
-    def is_membership_active(self) -> bool:
-        """
-        Check if the membership is currently active.
+    @classmethod
+    def from_dict(cls, data: dict):
+        """Create member from dict."""
+        member = cls(
+            user_id=data['user_id'],
+            name=data['name'],
+            email=data['email'],
+            phone=data.get('phone')
+        )
         
-        Returns:
-            bool: True if membership is active, False otherwise
-        """
-        return datetime.now() <= self._membership_expiry
-    
-    def renew_membership(self, months: int = 12) -> None:
-        """
-        Renew the membership.
+        # restore saved data
+        if 'registration_date' in data:
+            member._registration_date = datetime.fromisoformat(data['registration_date'])
+        if 'membership_expiry' in data:
+            member._membership_expiry = datetime.fromisoformat(data['membership_expiry'])
         
-        Args:
-            months: Number of months to extend the membership
-        """
-        if months <= 0:
-            raise ValueError("Renewal period must be positive")
+        member._borrowed_items = data.get('borrowed_items', [])
+        member._loan_history = data.get('loan_history', [])
+        member._fines_owed = data.get('fines_owed', 0.0)
         
-        if self.is_membership_active():
-            self._membership_expiry += timedelta(days=30 * months)
-        else:
-            self._membership_expiry = datetime.now() + timedelta(days=30 * months)
+        return member
     
     def __str__(self) -> str:
         """String representation of the member."""
@@ -238,12 +187,9 @@ class Member(User):
 
 class Staff(User):
     """
-    Staff class inheriting from User.
+    Library staff with administrative privileges.
     
-    Demonstrates:
-    - Inheritance from abstract base class
-    - Method overriding with staff-specific privileges
-    - Staff-specific administrative capabilities
+    Different staff roles (Manager/Librarian) have different permissions.
     """
     
     # Static attributes for staff
@@ -251,25 +197,16 @@ class Staff(User):
     
     def __init__(self, user_id: str, name: str, email: str, role: str = "Librarian",
                  hire_date: Optional[datetime] = None):
-        """
-        Initialise a staff member.
-        
-        Args:
-            user_id: Unique identifier for the staff member
-            name: Full name of the staff member
-            email: Email address of the staff member
-            role: Role/position of the staff member (Manager or Librarian)
-            hire_date: Date when staff member was hired
-        """
+        """Create a new staff member with role and hire date."""
         super().__init__(user_id, name, email)
         self._role = role
         self._hire_date = hire_date or datetime.now()
         self._permissions = self._get_default_permissions()
         
-        # Staff can borrow more items than regular members
+        # staff get higher borrowing limits
         self._borrowed_items: List[str] = []
         
-        # Increment staff-specific counter
+        # track staff count
         Staff._total_staff += 1
     
     # Properties for staff-specific attributes
@@ -280,12 +217,12 @@ class Staff(User):
     
     @staff_role.setter
     def staff_role(self, value: str):
-        """Set the staff role with validation."""
+        """Set staff role (Manager or Librarian only)."""
         valid_roles = ["Manager", "Librarian"]
         if value not in valid_roles:
-            raise ValueError(f"Staff role must be one of: {', '.join(valid_roles)}")
+            raise ValueError(f"Invalid role: {value}")
         self._role = value
-        self._permissions = self._get_default_permissions()  # Update permissions
+        self._permissions = self._get_default_permissions()  # refresh permissions
     
 
     

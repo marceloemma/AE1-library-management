@@ -14,34 +14,26 @@ class LibraryItem(ABC):
     """
     Abstract base class for all library items.
     
-    Demonstrates:
-    - Abstract class with abstract methods
-    - Encapsulation with protected attributes
-    - Static attribute for tracking total items
+    All library items (books, magazines, DVDs) inherit from this class.
+    Uses abstract methods to enforce implementation in subclasses.
     """
     
     # Static attribute to track total number of items created
     _total_items = 0
     
     def __init__(self, item_id: str, title: str):
-        """
-        Initialise a library item.
-        
-        Args:
-            item_id: Unique identifier for the item
-            title: Title of the item
-        """
+        """Create a new library item."""
         if not item_id or not item_id.strip():
             raise ValueError("Item ID cannot be empty")
         if not title or not title.strip():
             raise ValueError("Title cannot be empty")
             
-        self._item_id = item_id.strip()  # Protected attribute
+        self._item_id = item_id.strip()
         self._title = title.strip()
         self._is_available = True
         self._date_added = datetime.now()
         
-        # Increment static counter
+        # keep track of how many items we've made
         LibraryItem._total_items += 1
     
     # Properties for encapsulation
@@ -122,26 +114,17 @@ class LibraryItem(ABC):
 
 class User(ABC):
     """
-    Abstract base class for all library users.
+    Base class for library users (members and staff).
     
-    Demonstrates:
-    - Abstract class with abstract methods
-    - Encapsulation with protected attributes
-    - Static method for user validation
+    Contains common user properties and enforces implementation 
+    of role-specific methods in subclasses.
     """
     
     # Static attribute to track total number of users
     _total_users = 0
     
     def __init__(self, user_id: str, name: str, email: str):
-        """
-        Initialise a user.
-        
-        Args:
-            user_id: Unique identifier for the user
-            name: Full name of the user
-            email: Email address of the user
-        """
+        """Create a new user with basic info."""
         if not user_id or not user_id.strip():
             raise ValueError("User ID cannot be empty")
         if not name or not name.strip():
@@ -149,12 +132,12 @@ class User(ABC):
         if not self._is_valid_email(email):
             raise ValueError("Invalid email format")
             
-        self._user_id = user_id.strip()  # Protected attribute
+        self._user_id = user_id.strip()
         self._name = name.strip()
         self._email = email
         self._registration_date = datetime.now()
         
-        # Increment static counter
+        # keep count of users
         User._total_users += 1
     
     # Properties for encapsulation

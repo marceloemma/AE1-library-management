@@ -11,257 +11,190 @@ from .abstract_classes import LibraryItem
 
 
 class Book(LibraryItem):
-    """
-    Book class inheriting from LibraryItem.
-    
-    Demonstrates:
-    - Inheritance from abstract base class
-    - Method overriding (polymorphism)
-    - Additional specific attributes for books
-    """
+    """Book with author, ISBN, and page count."""
     
     # Static attribute specific to books
     _total_books = 0
     
     def __init__(self, item_id: str, title: str, author: str, isbn: str, pages: int = 0):
-        """
-        Initialise a book.
-        
-        Args:
-            item_id: Unique identifier for the book
-            title: Title of the book
-            author: Author of the book
-            isbn: ISBN number of the book
-            pages: Number of pages (optional)
-        """
-        super().__init__(item_id, title)  # Call parent constructor
+        """Create a new book."""
+        super().__init__(item_id, title)
         self._author = author
         self._isbn = isbn
         self._pages = pages
         
-        # Increment book-specific counter
+        # count books created
         Book._total_books += 1
     
     # Properties for book-specific attributes
     @property
     def author(self) -> str:
-        """Get the book author."""
+        """Get the author."""
         return self._author
-    
-    @author.setter
-    def author(self, value: str):
-        """Set the book author with validation."""
-        if not value or not value.strip():
-            raise ValueError("Author cannot be empty")
-        self._author = value.strip()
     
     @property
     def isbn(self) -> str:
-        """Get the book ISBN."""
+        """Get the ISBN."""
         return self._isbn
-    
-    @isbn.setter
-    def isbn(self, value: str):
-        """Set the book ISBN with validation."""
-        if not value or not value.strip():
-            raise ValueError("ISBN cannot be empty")
-        self._isbn = value.strip()
     
     @property
     def pages(self) -> int:
-        """Get the number of pages."""
+        """Get the page count."""
         return self._pages
-    
-    @pages.setter
-    def pages(self, value: int):
-        """Set the number of pages with validation."""
-        if value < 0:
-            raise ValueError("Pages cannot be negative")
-        self._pages = value
     
     @staticmethod
     def get_total_books() -> int:
-        """Get the total number of books created."""
+        """Get total number of books."""
         return Book._total_books
     
-    # Override abstract methods (polymorphism)
+    # Override abstract methods
     def check_out(self, user_id: str) -> bool:
-        """
-        Check out the book to a user.
-        
-        Args:
-            user_id: ID of the user checking out the book
-            
-        Returns:
-            bool: True if checkout successful, False otherwise
-        """
+        """Check out this book to a user."""
         if not self._is_available:
             return False
-        
         self._is_available = False
-        self._current_borrower = user_id
-        self._checkout_date = datetime.now()
         return True
     
     def check_in(self) -> bool:
-        """
-        Check in the book.
-        
-        Returns:
-            bool: True if check-in successful, False otherwise
-        """
+        """Return this book."""
         if self._is_available:
-            return False
-        
+            return False  # wasn't checked out
         self._is_available = True
-        self._current_borrower = None
-        self._checkout_date = None
         return True
     
     def get_item_type(self) -> str:
-        """
-        Get the type of the item.
-        
-        Returns:
-            str: "Book"
-        """
+        """Returns 'Book'."""
         return "Book"
     
-    def get_loan_period(self) -> int:
-        """
-        Get the loan period for books in days.
-        
-        Returns:
-            int: Number of days for book loan (21 days for books)
-        """
+    def get_loan_period(self):
+        """Books can be borrowed for 21 days."""
         return 21
+    
+    def to_dict(self) -> dict:
+        """Convert book to dictionary for database storage."""
+        return {
+            'item_id': self._item_id,
+            'title': self._title,
+            'type': 'Book',
+            'author': self._author,
+            'isbn': self._isbn,
+            'pages': self._pages,
+            'is_available': self._is_available,
+            'date_added': self._date_added.isoformat()
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict):
+        """Create book from dictionary data."""
+        book = cls(
+            item_id=data['item_id'],
+            title=data['title'],
+            author=data['author'],
+            isbn=data['isbn'],
+            pages=data.get('pages', 0)
+        )
+        book._is_available = data.get('is_available', True)
+        if 'date_added' in data:
+            book._date_added = datetime.fromisoformat(data['date_added'])
+        return book
     
     def __str__(self) -> str:
         """String representation of the book."""
         status = "Available" if self._is_available else "Checked out"
-        return f"Book: '{self._title}' by {self._author} (ISBN: {self._isbn}) - {status}"
+        return f"Book: '{self._title}' by {self._author} - {status}"
 
 
 class Magazine(LibraryItem):
-    """
-    Magazine class inheriting from LibraryItem.
-    
-    Demonstrates:
-    - Inheritance from abstract base class
-    - Method overriding with different behavior
-    - Magazine-specific attributes
-    """
+    """Magazine with publisher and issue info. Shorter loan period than books."""
     
     # Static attribute specific to magazines
     _total_magazines = 0
     
     def __init__(self, item_id: str, title: str, issue_number: str, publisher: str, 
                  publication_date: Optional[datetime] = None):
-        """
-        Initialise a magazine.
-        
-        Args:
-            item_id: Unique identifier for the magazine
-            title: Title of the magazine
-            issue_number: Issue number or identifier
-            publisher: Publisher of the magazine
-            publication_date: Date of publication (optional)
-        """
+        """Create a new magazine."""
         super().__init__(item_id, title)
         self._issue_number = issue_number
         self._publisher = publisher
         self._publication_date = publication_date or datetime.now()
         
-        # Increment magazine-specific counter
         Magazine._total_magazines += 1
     
-    # Properties for magazine-specific attributes
+    # Properties
     @property
     def issue_number(self) -> str:
-        """Get the magazine issue number."""
+        """Get the issue number."""
         return self._issue_number
-    
-    @issue_number.setter
-    def issue_number(self, value: str):
-        """Set the magazine issue number with validation."""
-        if not value or not value.strip():
-            raise ValueError("Issue number cannot be empty")
-        self._issue_number = value.strip()
     
     @property
     def publisher(self) -> str:
-        """Get the magazine publisher."""
+        """Get the publisher."""
         return self._publisher
-    
-    @publisher.setter
-    def publisher(self, value: str):
-        """Set the magazine publisher with validation."""
-        if not value or not value.strip():
-            raise ValueError("Publisher cannot be empty")
-        self._publisher = value.strip()
     
     @property
     def publication_date(self) -> datetime:
-        """Get the magazine publication date."""
+        """Get the publication date."""
         return self._publication_date
     
     @staticmethod
     def get_total_magazines() -> int:
-        """Get the total number of magazines created."""
+        """Get total number of magazines."""
         return Magazine._total_magazines
     
-    # Override abstract methods (polymorphism with different behavior)
+    # Override abstract methods
     def check_out(self, user_id: str) -> bool:
-        """
-        Check out the magazine to a user.
-        Magazines have shorter loan periods.
-        
-        Args:
-            user_id: ID of the user checking out the magazine
-            
-        Returns:
-            bool: True if checkout successful, False otherwise
-        """
+        """Check out this magazine."""
         if not self._is_available:
             return False
-        
         self._is_available = False
-        self._current_borrower = user_id
-        self._checkout_date = datetime.now()
         return True
     
     def check_in(self) -> bool:
-        """
-        Check in the magazine.
-        
-        Returns:
-            bool: True if check-in successful, False otherwise
-        """
+        """Return this magazine."""
         if self._is_available:
             return False
-        
         self._is_available = True
-        self._current_borrower = None
-        self._checkout_date = None
         return True
     
     def get_item_type(self) -> str:
-        """
-        Get the type of the item.
-        
-        Returns:
-            str: "Magazine"
-        """
+        """Returns 'Magazine'."""
         return "Magazine"
     
-    def get_loan_period(self) -> int:
-        """
-        Get the loan period for magazines in days.
+    def get_loan_period(self):
+        """Magazines have a shorter 7-day loan period."""
+        return 7  # shorter period for magazines
+    
+    def to_dict(self) -> dict:
+        """Convert to dict for storage."""
+        return {
+            'item_id': self._item_id,
+            'title': self._title,
+            'type': 'Magazine',
+            'issue_number': self._issue_number,
+            'publisher': self._publisher,
+            'publication_date': self._publication_date.isoformat(),
+            'is_available': self._is_available,
+            'date_added': self._date_added.isoformat()
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict):
+        """Create magazine from dict."""
+        pub_date = None
+        if 'publication_date' in data:
+            pub_date = datetime.fromisoformat(data['publication_date'])
         
-        Returns:
-            int: Number of days for magazine loan (7 days for magazines)
-        """
-        return 7
+        magazine = cls(
+            item_id=data['item_id'],
+            title=data['title'],
+            issue_number=data['issue_number'],
+            publisher=data['publisher'],
+            publication_date=pub_date
+        )
+        magazine._is_available = data.get('is_available', True)
+        if 'date_added' in data:
+            magazine._date_added = datetime.fromisoformat(data['date_added'])
+        return magazine
     
     def __str__(self) -> str:
         """String representation of the magazine."""
@@ -270,164 +203,102 @@ class Magazine(LibraryItem):
 
 
 class DVD(LibraryItem):
-    """
-    DVD class inheriting from LibraryItem.
-    
-    Demonstrates:
-    - Inheritance from abstract base class
-    - Method overriding with DVD-specific logic
-    - Additional validation for DVD-specific attributes
-    """
+    """DVD with runtime, genre, director and rating info."""
     
     # Static attribute specific to DVDs
     _total_dvds = 0
     
     def __init__(self, item_id: str, title: str, duration: int, genre: str, 
                  director: Optional[str] = None, rating: Optional[str] = None):
-        """
-        Initialise a DVD.
-        
-        Args:
-            item_id: Unique identifier for the DVD
-            title: Title of the DVD
-            duration: Duration in minutes
-            genre: Genre of the DVD
-            director: Director of the DVD (optional)
-            rating: Age rating of the DVD (optional)
-        """
+        """Create a new DVD."""
         super().__init__(item_id, title)
-        self._duration = duration
+        self._duration = max(0, duration)  # can't have negative runtime
         self._genre = genre
-        self._director = director
-        self._rating = rating
+        self._director = director or "Unknown"
+        self._rating = rating or "NR"  # Not Rated
         
-        # Increment DVD-specific counter
         DVD._total_dvds += 1
     
-    # Properties for DVD-specific attributes
+    # Properties
     @property
     def duration(self) -> int:
-        """Get the DVD duration in minutes."""
+        """Get the duration in minutes."""
         return self._duration
-    
-    @duration.setter
-    def duration(self, value: int):
-        """Set the DVD duration with validation."""
-        if value <= 0:
-            raise ValueError("Duration must be positive")
-        self._duration = value
     
     @property
     def genre(self) -> str:
-        """Get the DVD genre."""
+        """Get the genre."""
         return self._genre
     
-    @genre.setter
-    def genre(self, value: str):
-        """Set the DVD genre with validation."""
-        if not value or not value.strip():
-            raise ValueError("Genre cannot be empty")
-        self._genre = value.strip()
-    
     @property
-    def director(self) -> Optional[str]:
-        """Get the DVD director."""
+    def director(self) -> str:
+        """Get the director."""
         return self._director
     
-    @director.setter
-    def director(self, value: Optional[str]):
-        """Set the DVD director."""
-        self._director = value.strip() if value else None
-    
     @property
-    def rating(self) -> Optional[str]:
-        """Get the DVD rating."""
+    def rating(self) -> str:
+        """Get the rating."""
         return self._rating
-    
-    @rating.setter
-    def rating(self, value: Optional[str]):
-        """Set the DVD rating with validation."""
-        valid_ratings = ["G", "PG", "PG-13", "R", "NC-17", "NR"]
-        if value and value not in valid_ratings:
-            raise ValueError(f"Rating must be one of: {', '.join(valid_ratings)}")
-        self._rating = value
     
     @staticmethod
     def get_total_dvds() -> int:
-        """Get the total number of DVDs created."""
+        """Get total DVDs."""
         return DVD._total_dvds
     
-    # Override abstract methods (polymorphism with DVD-specific behavior)
+    # Override abstract methods
     def check_out(self, user_id: str) -> bool:
-        """
-        Check out the DVD to a user.
-        DVDs may have age restrictions.
-        
-        Args:
-            user_id: ID of the user checking out the DVD
-            
-        Returns:
-            bool: True if checkout successful, False otherwise
-        """
+        """Check out this DVD."""
         if not self._is_available:
             return False
-        
-        # Note: In a real system, we'd check user age against rating here
         self._is_available = False
-        self._current_borrower = user_id
-        self._checkout_date = datetime.now()
         return True
     
     def check_in(self) -> bool:
-        """
-        Check in the DVD.
-        
-        Returns:
-            bool: True if check-in successful, False otherwise
-        """
+        """Return this DVD."""
         if self._is_available:
             return False
-        
         self._is_available = True
-        self._current_borrower = None
-        self._checkout_date = None
         return True
     
     def get_item_type(self) -> str:
-        """
-        Get the type of the item.
-        
-        Returns:
-            str: "DVD"
-        """
+        """Returns 'DVD'."""
         return "DVD"
     
-    def get_loan_period(self) -> int:
-        """
-        Get the loan period for DVDs in days.
-        
-        Returns:
-            int: Number of days for DVD loan (14 days for DVDs)
-        """
-        return 14
+    def get_loan_period(self):
+        """DVDs can be borrowed for 2 weeks."""
+        return 14  # 2 weeks
     
-    def get_formatted_duration(self) -> str:
-        """
-        Get the duration formatted as hours and minutes.
-        
-        Returns:
-            str: Duration in "Xh Ym" format
-        """
-        hours = self._duration // 60
-        minutes = self._duration % 60
-        
-        if hours > 0:
-            return f"{hours}h {minutes}m"
-        else:
-            return f"{minutes}m"
+    def to_dict(self) -> dict:
+        """Convert to dict."""
+        return {
+            'item_id': self._item_id,
+            'title': self._title,
+            'type': 'DVD',
+            'duration': self._duration,
+            'genre': self._genre,
+            'director': self._director,
+            'rating': self._rating,
+            'is_available': self._is_available,
+            'date_added': self._date_added.isoformat()
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict):
+        """Create DVD from dict."""
+        dvd = cls(
+            item_id=data['item_id'],
+            title=data['title'],
+            duration=data.get('duration', 0),
+            genre=data.get('genre', 'Unknown'),
+            director=data.get('director'),
+            rating=data.get('rating')
+        )
+        dvd._is_available = data.get('is_available', True)
+        if 'date_added' in data:
+            dvd._date_added = datetime.fromisoformat(data['date_added'])
+        return dvd
     
     def __str__(self) -> str:
-        """String representation of the DVD."""
+        """String representation."""
         status = "Available" if self._is_available else "Checked out"
-        director_info = f" directed by {self._director}" if self._director else ""
-        return f"DVD: '{self._title}'{director_info} ({self.get_formatted_duration()}, {self._genre}) - {status}" 
+        return f"DVD: '{self._title}' ({self._duration}min, {self._genre}) - {status}" 

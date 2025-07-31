@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple
 import sys
 import os
-# Add the src directory to the Python path for relative imports
+        # need this for imports to work properly
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from models.abstract_classes import LibraryItem, User
@@ -24,13 +24,9 @@ from .schema import create_tables, get_schema_version, SCHEMA_VERSION
 
 class DatabaseManager:
     """
-    Manages all database operations for the library management system.
+    Handles all database operations. 
     
-    Demonstrates:
-    - Database abstraction layer
-    - CRUD operations
-    - Data serialisation/deserialisation
-    - Transaction management
+    Saves/loads users, items, and loans to/from SQLite.
     """
     
     def __init__(self, db_path: str = "library.db"):

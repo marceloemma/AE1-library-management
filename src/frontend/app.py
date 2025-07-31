@@ -171,10 +171,9 @@ def render_header():
 
 
 def main():
-    """Main application function."""
+    """Main application entry point."""
     st.set_page_config(
-        page_title="Library Management System",
-        page_icon="📚",
+        page_title="Northeastern University Library",
         layout="wide",
         initial_sidebar_state="expanded"
     )
@@ -187,16 +186,16 @@ def main():
     if not st.session_state.authenticated:
         render_login_page()
     else:
+        # Show the header
         render_header()
         
-        # Route to appropriate interface based on user role
-        if st.session_state.user.get_role() == "Member":
-            render_member_interface()
-        elif st.session_state.user.get_role() == "Staff":
+        # Route to appropriate interface based on user type
+        current_user = st.session_state.user
+        if hasattr(current_user, 'staff_role'):  # Staff user
             render_staff_interface()
-        else:
-            st.error("Unknown user role. Please contact the administrator.")
+        else:  # Member user
+            render_member_interface()
 
 
 if __name__ == "__main__":
-    main() 
+    main()  # run the app 

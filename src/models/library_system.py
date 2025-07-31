@@ -15,13 +15,10 @@ from .loan import Loan
 
 class LibrarySystem:
     """
-    Central controller class for the library management system.
+    Main controller that manages all library operations.
     
-    Demonstrates:
-    - Composition pattern (containing and managing other objects)
-    - Business logic coordination
-    - Error handling and validation
-    - Statistical reporting and analytics
+    Coordinates users, items, and loans. Think of it as the 
+    librarian's main system interface.
     """
     
     def __init__(self, name: str = "City Library"):
@@ -32,10 +29,10 @@ class LibrarySystem:
             name: Name of the library
         """
         self._name = name
-        self._items: Dict[str, LibraryItem] = {}  # item_id -> LibraryItem
-        self._users: Dict[str, User] = {}  # user_id -> User
-        self._loans: Dict[str, Loan] = {}  # loan_id -> Loan
-        self._active_loans: Dict[str, List[str]] = {}  # user_id -> [loan_ids]
+        self._items: Dict[str, LibraryItem] = {}  # all library items
+        self._users: Dict[str, User] = {}  # all registered users
+        self._loans: Dict[str, Loan] = {}  # all loan records
+        self._active_loans: Dict[str, List[str]] = {}  # which loans are active per user
         self._system_startup_time = datetime.now()
     
     # Properties
