@@ -120,19 +120,12 @@ def render_login_page():
         st.code("""
 M001 - Marcelo Amorelli
 M002 - Umar Hussain
-M003 - Carol Davis
-M004 - David Wilson 
-M005 - Emma Brown
         """)
     
     with col2:
         st.write("**Staff Login Examples:**")
         st.code("""
 S001 - Jiri Motejlek (Manager)
-S002 - Michael Rodriguez (Librarian)
-S003 - Jennifer Martinez (Librarian)
-S004 - Robert Thompson (Manager)
-S005 - Lisa Garcia (Librarian)
         """)
     
     with st.expander("System Information"):
