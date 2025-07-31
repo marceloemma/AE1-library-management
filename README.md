@@ -63,7 +63,7 @@ AE1-library-management/
 
 ### Prerequisites
 
-- Python 3.8 or higher
+- Python 3.10 or higher
 - pip package manager
 
 ### Installation
@@ -84,19 +84,15 @@ AE1-library-management/
    pip install -r requirements.txt
    ```
 
-4. **Initialise the database with sample data**:
+4. **Initialise the database with sample data if not already**:
    ```bash
    python scripts/seed_database.py
    ```
 
-5. **Run the test suite** (optional):
-   ```bash
-   python scripts/test_system.py
-   ```
 
 ## Running the Application
 
-### Web Interface (Recommended)
+### Web Interface
 
 1. **Start the Streamlit application**:
    ```bash
@@ -199,4 +195,7 @@ The system uses SQLite with the following main tables:
 - **Abstract Classes**: Force subclasses to implement required methods
 - **Properties**: Control access to internal data
 - **Static Methods**: Track counters and system stats
+
+
+Happy Reading!
 
