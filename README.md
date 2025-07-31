@@ -26,10 +26,9 @@ This project implements a library management system with a focus on demonstratin
 
 ## Technology Stack
 
-- **Backend**: Python 3.8+
+- **Backend**: Python 3.10+
 - **Frontend**: Streamlit
 - **Database**: SQLite
-- **Testing**: pytest
 - **Architecture**: Layered architecture with models, database, and frontend layers
 
 ## Project Structure
@@ -50,13 +49,8 @@ AE1-library-management/
 │       ├── app.py                # Main Streamlit application
 │       ├── member_interface.py   # Member UI components
 │       └── staff_interface.py    # Staff UI components
-├── scripts/
-│   ├── seed_database.py          # Database seeding script
-│   └── test_system.py            # Comprehensive test suite
-├── assets/
-│   └── uml_library_management.png # UML class diagram
 ├── requirements.txt              # Python dependencies
-└── README.md                     # This file
+└── README.md                     # This file!
 ```
 
 ## Setup Instructions
