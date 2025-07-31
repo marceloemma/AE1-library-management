@@ -90,7 +90,7 @@ AE1-library-management/
 
 1. **Start the Streamlit application**:
    ```bash
-   streamlit run src/frontend/app.py
+   streamlit run src/frontend/app.py --server.headless=true --server.port=8501
    ```
 
 2. **Access the application** in your web browser at `http://localhost:8501`
